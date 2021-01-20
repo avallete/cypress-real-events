@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shadow DOM Tests</title>
+</head>
+<body>
+<div id="host"></div>
+<!--Padding to test if we can properly scroll onto host2-->
+<div style="height: 2500px; width: 150px; background-color: aqua"></div>
+<div id="host2"></div>
+<div id="logging">
+    <p>Fired events:</p>
+</div>
+<script>
+    function createAndAttachShadowRootElem(host) {
+        document
+            .getElementById(host)
+            .attachShadow({mode: 'open'})
+            .innerHTML = `
+        <style>
+            .shadow-button {
+                height: 100px;
+                width: 100px;
+                background-color: blue;
+            }
+
+            .shadow-button:hover {
+                background-color: red;
+            }
+        </style>
+        <div
+            id="hoverme"
+            class="shadow-button"
+            onmousedown="appendEvent('onmousedown', '${host}#hoverme')"
+            onmouseenter="appendEvent('onmouseenter', '${host}#hoverme')"
+            onmouseleave="appendEvent('onmouseleave', '${host}#hoverme')"
+            onmousemove="appendEvent('onmousemove', '${host}#hoverme')"
+            onmouseout="appendEvent('onmouseout', '${host}#hoverme')"
+            onmouseover="appendEvent('onmouseover', '${host}#hoverme')"
+            onmouseup="appendEvent('onmouseup', '${host}#hoverme')"
+        >SHADOW DOM</div>
+    `;
+        document
+            .getElementById(host)
+            .shadowRoot.getElementById('hoverme')
+            .innerHTML = `
+            <style>
+                .shadow-recursive-button {
+                    height: 50px;
+                    width: 50px;
+                    background-color: blue;
+                }
+
+                .shadow-recursive-button:hover {
+                    background-color: red;
+                }
+            </style>
+            <div
+                id="recursivehoverme"
+                class="shadow-recursive-button"
+                onmousedown="appendEvent('onmousedown', '${host}#recursivehoverme')"
+                onmouseenter="appendEvent('onmouseenter', '${host}#recursivehoverme')"
+                onmouseleave="appendEvent('onmouseleave', '${host}#recursivehoverme')"
+                onmousemove="appendEvent('onmousemove', '${host}#recursivehoverme')"
+                onmouseout="appendEvent('onmouseout', '${host}#recursivehoverme')"
+                onmouseover="appendEvent('onmouseover', '${host}#recursivehoverme')"
+                onmouseup="appendEvent('onmouseup', '${host}#recursivehoverme')"
+            >SHADOW Recursive DOM</div>
+        `;
+    }
+    createAndAttachShadowRootElem('host');
+    createAndAttachShadowRootElem('host2');
+    const logging = document.getElementById("logging");
+
+    function appendEvent(name, element) {
+        let p = document.createElement("p");
+        p.innerHTML = `${name} on ${element}`;
+        logging.appendChild(p);
+    }
+</script>
+</body>
+</html>
